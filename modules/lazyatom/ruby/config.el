@@ -14,6 +14,7 @@
   "r" 'lazyatom/test-file
   "t" 'lazyatom/test-single
   "e" 'lazyatom/test-recent
+  "h" 'lazyatom/test-select-from-history
   "d" 'lazyatom/test-debug
   "b" 'lazyatom/toggle-backtrace
   "s" 'lazyatom/toggle-spring

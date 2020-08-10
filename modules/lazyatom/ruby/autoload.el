@@ -6,6 +6,16 @@
   "The last test command we ran")
 
 ;;;###autoload
+(defvar lazyatom/test-history
+  nil
+  "A list of previous test commands")
+
+;;;###autoload
+(defun lazyatom/add-to-test-history (test-command)
+  (set 'lazyatom/test-history (cons test-command (delete test-command lazyatom/test-history)))
+  "Add an item to the test history")
+
+;;;###autoload
 (defun lazyatom/activate-project-versions ()
   (chruby-use-corresponding)
   )
@@ -183,6 +193,7 @@
 ;;;###autoload
 (defun lazyatom/test-file ()
   (interactive)
+  (lazyatom/add-to-test-history (lazyatom/test-command-for buffer-file-name))
   (set 'lazyatom/last-test-command (lazyatom/test-command-for buffer-file-name))
   (lazyatom/run-test-command (lazyatom/test-command-for buffer-file-name))
   )
@@ -190,6 +201,7 @@
 ;;;###autoload
 (defun lazyatom/test-single ()
   (interactive)
+  (lazyatom/add-to-test-history (lazyatom/test-command-with-line-for buffer-file-name (line-number-at-pos (point))))
   (set 'lazyatom/last-test-command (lazyatom/test-command-with-line-for buffer-file-name (line-number-at-pos (point))))
   (lazyatom/run-test-command(lazyatom/test-command-with-line-for buffer-file-name (line-number-at-pos (point))))
   )
@@ -199,6 +211,20 @@
   (interactive)
   (lazyatom/run-test-command lazyatom/last-test-command)
   )
+
+;;;###autoload
+(defun lazyatom/test-select-from-history()
+  (interactive)
+  (ivy-read "Select test command: "
+    lazyatom/test-history
+    ;; :keymap counsel-describe-map
+    ;; :preselect (ivy-thing-at-point)
+    :history 'lazyatom-test-select-from-history-history
+    :require-match t
+    :action (lambda (x)
+              (lazyatom/run-test-command x)
+              )
+    :caller 'lazyatom/test-select-from-history))
 
 ;;;###autoload
 (defun lazyatom/test-debug ()
